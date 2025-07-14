@@ -27,7 +27,8 @@ class ExpertController extends Controller
         // Return success response
 
         return response()->json([
-            'success' => true
+            'success' => true,
+            'message' => 'OTP sent successfully',
         ]);
     }
 
