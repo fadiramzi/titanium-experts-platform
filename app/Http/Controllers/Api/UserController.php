@@ -82,5 +82,21 @@ class UserController extends Controller
         ]);
     }
 
-    
+    public function delete(Request $request, $id)
+    {
+        // logic
+        $request->validate([
+            'id' => 'required|exists:users,id'
+        ]);
+        
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User deleted successfully'
+        ]);
+    }   
+
+
 }

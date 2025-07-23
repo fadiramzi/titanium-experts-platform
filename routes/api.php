@@ -13,9 +13,14 @@ use Illuminate\Support\Facades\Route;
 Route::post('/experts/signup', [ExpertController::class, 'signup']);
 Route::post('/experts/verify', [ExpertController::class, 'verify']);
 
-Route::post('/users/add', [UserController::class, 'add']);
-Route::get('/users/get', [UserController::class, 'getList']);
-Route::put('/users/update/{id}', [UserController::class, 'update']);
+
+// refactor routes to use convention name of api resources
+Route::post('/users', [UserController::class, 'add']);
+Route::get('/users', [UserController::class, 'getList']);
+Route::put('/users/{id}', [UserController::class, 'update']);
+Route::delete('/users/{id}', [UserController::class, 'delete']);
+
+
 
 
 
