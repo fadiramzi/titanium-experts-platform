@@ -4,25 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UserController extends Controller
 {
     //
     public function getList()
     {
+        // connect to database and get the list of users
+       $users =  User::all();
+       // SELECT * FROM users;
+       
         return response()->json(
-           [ // list
-             [ // object
-                'userId' => 1,
-                'name' => 'John Doe',
-                'email' => 'fadi@gmail.com'
-             ],
-             [ // object
-                'userId' => 2,
-                'name' => 'FAdi',
-                'email' => 'raf@gmail.com'
-            ]
-           ]
+          $users
         );
     }
     public function add(Request $request)
@@ -30,26 +24,29 @@ class UserController extends Controller
         // check valdiation input
         $request->validate([
             'name'=>'required|string|max:10',
-            'email'=>'required|email',
-            'userId'=>'required|integer'
+            'email'=>'required|email|unique:users,email',
+            'password'=>'required|min:6'
         ]);
         // if validation fails, it will return 422 error with validation errors
 
         // logic
         $name = strtoupper($request->input('name'));
         $email = $request->input('email');
-        $userId = $request->input('userId');
+        $password = $request->input('password');
+
+        // store data into DATABASE table users
+        $user = User::create([
+            'name'=>$name ,
+            'email'=>$email,
+            'password'=>$password // hashing password
+        ]);
 
         // fprmating response to the client
         // imagine creation user is done
         return response()->json([
             'status' => 'success',
             'message' => 'User created successfully',
-            'userData' => [
-                'userId' => $userId,
-                'name' => $name,
-                'email' => $email
-            ]
+            'userData' => $user
         ]);
     }
 }
