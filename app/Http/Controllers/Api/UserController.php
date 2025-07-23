@@ -14,7 +14,7 @@ class UserController extends Controller
         // connect to database and get the list of users
        $users =  User::all();
        // SELECT * FROM users;
-       
+
         return response()->json(
           $users
         );
@@ -49,4 +49,38 @@ class UserController extends Controller
             'userData' => $user
         ]);
     }
+
+    public function update(Request $request, $id)
+    {
+        //check validation input
+        $request->validate([
+            'name' => 'sometimes|string|max:10',
+            'email' => 'sometimes|email|unique:users,email,' . $id,
+            'password' => 'sometimes|min:6'
+        ]);
+
+        // logic
+        $user = User::findOrFail($id);
+        // $user-> name : FADI
+        // $user-> email : fadi@gmail.com
+        // 
+        if($request->has('name'))
+        {   
+            $user->name = $request->input('name');
+        }
+
+        if($request->has('email'))
+        {
+            $user->email = $request->input('email');
+        }
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User updated successfully',
+            'userData' => $user
+        ]);
+    }
+
+    
 }

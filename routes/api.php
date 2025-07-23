@@ -15,6 +15,7 @@ Route::post('/experts/verify', [ExpertController::class, 'verify']);
 
 Route::post('/users/add', [UserController::class, 'add']);
 Route::get('/users/get', [UserController::class, 'getList']);
+Route::put('/users/update/{id}', [UserController::class, 'update']);
 
 
 
