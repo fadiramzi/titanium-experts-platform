@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 // if request recevied on /items, them route the request to index function inside ItemController
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/verify', [AuthController::class, 'verify']);
+
 
 Route::post('/experts/verify', [ExpertController::class, 'verify']);
 
@@ -22,7 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // protected
     Route::post('/users', [UserController::class, 'add']);
     Route::get('/users', [UserController::class, 'getList']);
-
+    Route::get('/users/me',[UserController::class, 'me']);
 });
 
 Route::put('/users/{id}', [UserController::class, 'update']);

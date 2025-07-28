@@ -98,5 +98,17 @@ class UserController extends Controller
         ]);
     }   
 
+    // Retrurn my profile onlyt
+    public function me(Request $request)
+    {
+        $user = $request->user();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User profile retrieved successfully',
+            'userData' => $user
+        ]);
+    }
+
 
 }
