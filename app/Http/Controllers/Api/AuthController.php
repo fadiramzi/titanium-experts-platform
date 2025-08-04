@@ -17,24 +17,44 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'type' => 'required|string|in:customer,expert', // Ensure type is either customer or expert
+            'bio' => 'required_if:type,expert|string|max:500', // Bio is required for experts
+            'industry' => 'required_if:type,expert|string|max:255', // Industry is
+            'session_price'=>'required_if:type,expert|number|1'
         ]);
+       
+
         $otpCode = rand(100000, 999999); // Generate a random OTP code
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password, // Password will be hashed automatically due to the 'hashed' cast in User model
             'otp_code' => $otpCode, // Assuming you have an otp_code field in your users table
-            'type' => $request->type, // Set the user type
+            'type' => $request->type // Set the user type
+           
         ]);
-
+        // Hello
+        
+        
+        
+        if($request->type === 'expert') {
+            // If the user is an expert, create an expert profile
+            $user->expert()->create([
+                'bio' => $request->bio,
+                'industry' => $request->industry,
+                'session_price' => $request->session_price
+            ]);
+        }
         // Send otp via SMS or email
         // Code TO DO sending otp to user
         // later
+
+        
 
         return response()->json([
             'success' => true,
             'message' => 'User registered successfully, please verify your account before login',
             'user' => $user,
+
         ]);
         
     }
@@ -46,6 +66,14 @@ class AuthController extends Controller
         ]);
         $user = User::where('email', $request->email)->first();
 
+       
+        if(!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+        
         if($user->email_verified_at === null) {
             return response()->json([
                 'success' => false,

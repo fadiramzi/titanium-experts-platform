@@ -9,15 +9,82 @@ use App\Models\User;
 class UserController extends Controller
 {
     //
-    public function getList()
+    public function getList(Request $request)
     {
-        // connect to database and get the list of users
-       $users =  User::all();
-       // SELECT * FROM users;
+        $request->validate([
+            'userType' => 'nullable|string|in:customer,expert', // Ensure userType is either customer or expert
+            'industry' => 'nullable|string|max:255', // Optional industry filter
+            'sortBy'=> 'nullable|string|in:name,session_price',
+            'sortDir' => 'nullable|string|in:asc,desc',
+            'page' => 'nullable|integer|min:1',
+            'perPage' => 'nullable|integer|min:1|max:5'
+        ]);
+        $sortBy = $request->sortBy ?? 'id';
+        $sortDir = $request->sortDir ?? 'desc';
 
-        return response()->json(
-          $users
-        );
+        $page = $request->page ?? 1;
+        $offset = ($page - 1) * ($request->perPage ?? 10); // Default to 10 per page
+        $perPage = $request->perPage ?? 10;
+
+
+         // extract the user type from the request URL params
+         $userType = $request->userType ?? null; // Default to null if not provided
+        // connect to database and get the list of users
+
+        $query = User::query();
+        $query = $query->with('expert'); // Eager load the expert relationship
+        // SELECT * FROM users
+
+        if($userType) {
+            // If userType is provided, filter users by type
+            // SELECT * FROM users WHERE type = $userType
+            $query = $query->where('type', $userType);
+        } 
+
+        if($request->industry) {
+            // If industry is provided, filter users by industry
+            // SELECT * FROM users WHERE type = $userType && $userType = $request->userType
+            $query = $query->whereHas('expert', function($q) use ($request) {
+                $q->where('industry', $request->industry);
+            });
+        }
+        // Handle sorting by related table columns
+        if($sortBy === 'session_price') {
+            // Join with experts table to sort by session_price
+            $query = $query->join('experts', 'users.id', '=', 'experts.user_id') // Adjust join condition based on your FK
+                        ->orderBy('experts.session_price', $sortDir)
+                        ->select('users.*'); // Only select users columns to avoid duplicates
+        } else {
+            // Sort by users table columns
+            $query = $query->orderBy($sortBy, $sortDir);
+        }
+
+
+        $totalCount = $query->count(); // Get total count for pagination
+        $currentPage = $page;
+        $offset = $offset; // Calculate offset for pagination
+
+        $query = $query->offset($offset)
+                          ->limit($perPage); // Apply pagination    
+
+        $users = $query->get(); // result maybe 10
+        
+        // Paginate the results
+        
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User list retrieved successfully',
+            'data' => $users,
+            'pagination' => [
+                'total' => $totalCount,
+                'current_page' => $currentPage,
+                'per_page' => $perPage,
+                'last_page' => ceil($totalCount / $perPage),
+                'offset' => $offset
+            ]
+        ]);
+        
     }
     public function add(Request $request)
     {

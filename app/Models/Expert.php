@@ -13,7 +13,8 @@ class Expert extends Model
         'bio',
         'industry',
         'user_id',
-        'profile_picture'
+        'profile_picture',
+        'session_price', // Added session_price to fillable attributes
     ];
 
     /**
