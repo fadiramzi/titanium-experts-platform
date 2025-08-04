@@ -4,20 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Expert extends Model
+class Booking extends Model
 {
     //
     protected $fillable = [
-        'bio',
-        'industry',
+        'expert_id',
         'user_id',
-        'profile_picture'
+        'scheduled_at',
+        'hours',
     ];
 
     /**
-     * Get the user that owns the Expert
+     * Get the user that owns the Booking
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -27,12 +27,12 @@ class Expert extends Model
     }
 
     /**
-     * Get all of the comments for the Expert
+     * Get the expert that owns the Booking
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function bookings(): HasMany
+    public function expert(): BelongsTo
     {
-        return $this->hasMany(Booking::class, 'expert_id');
+        return $this->belongsTo(User::class, 'expert_id');
     }
 }

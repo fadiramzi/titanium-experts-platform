@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ExpertController;
 use Illuminate\Http\Request;
@@ -15,16 +16,16 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/verify', [AuthController::class, 'verify']);
 
-
-Route::post('/experts/verify', [ExpertController::class, 'verify']);
-
-
 // refactor routes to use convention name of api resources
 Route::middleware('auth:sanctum')->group(function () {
     // protected
     Route::post('/users', [UserController::class, 'add']);
     Route::get('/users', [UserController::class, 'getList']);
     Route::get('/users/me',[UserController::class, 'me']);
+
+    Route::post('/bookings', [BookingController::class, 'book']);
+    Route::get('/bookings/me', [BookingController::class, 'me']);
+
 });
 
 Route::put('/users/{id}', [UserController::class, 'update']);

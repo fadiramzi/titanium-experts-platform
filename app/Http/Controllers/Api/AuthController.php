@@ -16,6 +16,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'type' => 'required|string|in:customer,expert', // Ensure type is either customer or expert
         ]);
         $otpCode = rand(100000, 999999); // Generate a random OTP code
         $user = User::create([
@@ -23,6 +24,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => $request->password, // Password will be hashed automatically due to the 'hashed' cast in User model
             'otp_code' => $otpCode, // Assuming you have an otp_code field in your users table
+            'type' => $request->type, // Set the user type
         ]);
 
         // Send otp via SMS or email
@@ -99,6 +101,16 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Account verified successfully, you can now login'
+        ]);
+    }
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $user->tokens()->delete(); // Revoke all tokens for the user
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User logged out successfully',
         ]);
     }
 }
