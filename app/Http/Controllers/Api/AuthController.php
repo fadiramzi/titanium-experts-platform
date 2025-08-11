@@ -19,7 +19,7 @@ class AuthController extends Controller
             'type' => 'required|string|in:customer,expert', // Ensure type is either customer or expert
             'bio' => 'required_if:type,expert|string|max:500', // Bio is required for experts
             'industry' => 'required_if:type,expert|string|max:255', // Industry is
-            'session_price'=>'required_if:type,expert|numeric|1'
+            'session_price'=>'required_if:type,expert|numeric|min:1'
         ]);
        
 
