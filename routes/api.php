@@ -17,7 +17,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/verify', [AuthController::class, 'verify']);
 
 // refactor routes to use convention name of api resources
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['cookie.filter', 'auth:sanctum'])->group(function () {
     // protected
     Route::post('/users', [UserController::class, 'add']);
     Route::get('/users', [UserController::class, 'getList']);
@@ -25,11 +25,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/bookings', [BookingController::class, 'book']);
     Route::get('/bookings/me', [BookingController::class, 'me']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::delete('/users/{id}', [UserController::class, 'delete']);
 
 });
 
-Route::put('/users/{id}', [UserController::class, 'update']);
-Route::delete('/users/{id}', [UserController::class, 'delete']);
 
 
 

@@ -84,12 +84,15 @@ class AuthController extends Controller
             // Generate a token for the user
             $token = $user->createToken('experts_token')->plainTextToken;
 
+            // set it in cookie instead of sending it back in response body
+            $appCookie = cookie('experts_platform_token', $token, 180, '/', null, false, true, false, 'Lax');
+
             return response()->json([
                 'success' => true,
                 'message' => 'User logged in successfully',
                 'user' => $user,
-                'token' => $token,
-            ]);
+                // 'token' => $token,
+            ])->cookie($appCookie);
         }   
         return response()->json([
             'success' => false,

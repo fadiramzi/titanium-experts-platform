@@ -13,6 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //
+        $middleware->alias([
+            'cookie.filter' => App\Http\Middleware\CookieFilter::class,
+        ]);
+
+        // prioritize the cookie filter middleware to run before the auth:sanctum middleware
+        $middleware->priority([
+            App\Http\Middleware\CookieFilter::class,
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Auth\Middleware\Authenticate::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

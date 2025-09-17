@@ -14,10 +14,11 @@ class UserController extends Controller
         $request->validate([
             'userType' => 'nullable|string|in:customer,expert', // Ensure userType is either customer or expert
             'industry' => 'nullable|string|max:255', // Optional industry filter
+            'q' => 'nullable|string|max:255', // Optional search query
             'sortBy'=> 'nullable|string|in:name,session_price',
             'sortDir' => 'nullable|string|in:asc,desc',
-            'page' => 'nullable|integer|min:1',
-            'perPage' => 'nullable|integer|min:1|max:5'
+            'page' => 'nullable|numeric|min:1',
+            'perPage' => 'nullable|numeric|min:1|max:25'
         ]);
         $sortBy = $request->sortBy ?? 'id';
         $sortDir = $request->sortDir ?? 'desc';
@@ -35,6 +36,15 @@ class UserController extends Controller
         $query = $query->with('expert'); // Eager load the expert relationship
         // SELECT * FROM users
 
+        if($request->q) {
+            // If search query is provided, filter users by name or email
+            // SELECT * FROM users WHERE name LIKE %$request->q% OR email LIKE %$request->q%
+            $searchTerm = '%' . $request->q . '%';
+            $query = $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', $searchTerm)
+                  ->orWhere('email', 'like', $searchTerm);
+            });
+        }
         if($userType) {
             // If userType is provided, filter users by type
             // SELECT * FROM users WHERE type = $userType
@@ -78,10 +88,10 @@ class UserController extends Controller
             'data' => $users,
             'pagination' => [
                 'total' => $totalCount,
-                'current_page' => $currentPage,
-                'per_page' => $perPage,
-                'last_page' => ceil($totalCount / $perPage),
-                'offset' => $offset
+                'current_page' =>  intval($currentPage),
+                'per_page' => intval($perPage),
+                'last_page' =>  intval(ceil($totalCount / $perPage)),
+                'offset' =>  intval($offset)
             ]
         ]);
         
